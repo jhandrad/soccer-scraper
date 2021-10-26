@@ -1,0 +1,9 @@
+1 - 19/10/2021 21:56: The match does not have odds avaliable or they arent in expected format or the page doesnt load on the expected time.
+match odds on url: https://www.betexplorer.com/soccer/africa/african-championship-women/djibouti-rwanda/xMBnbvKJ/, were not entered in database
+
+2 - 19/10/2021 21:57: The match does not have odds avaliable or they arent in expected format or the page doesnt load on the expected time.
+match odds on url: https://www.betexplorer.com/soccer/angola/girabola/desportivo-huila-sagrada/n3wHiDUt/, were not entered in database
+
+3 - 19/10/2021 22:05: The match does not have odds avaliable or they arent in expected format or the page doesnt load on the expected time.
+match odds on url: https://www.betexplorer.com/soccer/asia/asian-cup-women/united-arab-emirates-guam/pChCM407/, were not entered in database
+
