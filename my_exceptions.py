@@ -1,2 +1,2 @@
-class InsertIontoDBError(Exception):
+class InsertIntoDBError(Exception):
     pass
