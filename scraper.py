@@ -1,4 +1,5 @@
 from datetime import datetime
+from timeit import default_timer as timer
 import os
 import time
 
@@ -137,6 +138,8 @@ class Scraper():
 
 
 scraper = Scraper()
+start = timer()
 scraper.do_scraping(
     'https://www.betexplorer.com/soccer/england/premier-league-2020-2021/results/', 1)
-
+end = timer()
+print(f'Tempo gasto: {(end - start)/3600:.3f}h')
