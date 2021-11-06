@@ -24,7 +24,7 @@ Caso o primeiro modo de execução tenha sido escolhido, digitar um número entr
 
 Por último, digite o número de temporadas anteriores à temporada 2020-2021 que deseja coletar.
 
-_*caso escolha o segundo modo execução, um arquivo matches.txt e um odds.txt serão criados no diretório em que programa estiver localizado._
+_*caso escolha o segundo modo execução, um arquivo matches.txt e um odds.txt serão criados no diretório em que o programa estiver localizado._
 
 ### Arquivos
 
@@ -44,5 +44,6 @@ _*As versões específicas de cada lib estão no arquivo requirements.txt._
 ### Observações
 
 * Mudar o caminho do interpretador python no arquivo main.py de acordo com a localização do mesmo na sua máquina.
-* Certificar-se de que as libs necessárias estão no mesmo path do interpretador python
+* Certificar-se de que as libs necessárias estão no mesmo path do interpretador python.
 * Em caso de problemas verificar o arquivo scraper_log.txt que é gerado ao final de uma execução com falha.
+* O programa leva cerca de 1,5 hora para coletar os dados de uma temporada inteira.
