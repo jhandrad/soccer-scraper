@@ -1,6 +1,6 @@
 # soccer-scraper
 
-Scraper escrito em python para coletar dados de jogos de fultebol do site betexplorer.
+Scraper escrito em python para coletar e armazenar em um bd dados de jogos de fultebol do site betexplorer.
 
 ### Modos de execução
 
