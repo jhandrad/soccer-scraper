@@ -11,7 +11,7 @@ def create_db() -> None:
             cursor.execute('''
                         CREATE TABLE matches(
                             id_match INTEGER primary key AUTOINCREMENT,
-                            championship VARCHAR(40) NOT NULL,
+                            league VARCHAR(20) NOT NULL,
                             season VARCHAR(10) NOT NULL,
                             home VARCHAR(30) NOT NULL,
                             visitor VARCHAR(30) NOT NULL,
@@ -39,11 +39,11 @@ def add_match_db(match: list, odds: dict) -> None:
             try:
                 cursor.execute('PRAGMA foreign_keys = ON;')
                 cursor.execute('''
-                                    INSERT INTO matches (championship, season, home,
+                                    INSERT INTO matches (league, season, home,
                                     visitor, game_score) VALUES(?,?,?,?,?)
                             ''', (match[0], match[1], match[2], match[3], match[4]))
                 cursor.execute(
-                                '''SELECT id_match FROM matches WHERE id_match=
+                    '''SELECT id_match FROM matches WHERE id_match=
                                    (SELECT MAX(id_match) FROM matches)''')
                 fk_id_match = int(cursor.fetchone()[0])
                 for i in odds:
@@ -59,24 +59,24 @@ def add_match_db(match: list, odds: dict) -> None:
 def get_db() -> None:
     with sqlite3.connect('matches.db') as conn:
         with closing(conn.cursor()) as cursor:
-            cursor.execute('PRAGMA foreign_keys = ON;')  
-            cursor.execute('SELECT * FROM matches')
+            cursor.execute('PRAGMA foreign_keys = ON;')
             matches = open('matches.txt', 'w')
-            matches.write('{0:^10} | {0:^40} | {0:^10} | {1:^30} | {2:^30} | {3:^10}\n'.format
-                        ('id', 'championship', 'season','home', 'visitor', 'score'))
+            matches.write('{0:^10} | {1:^20} | {2:^10} | {3:^30} | {4:^30} | {5:^10}\n'.format
+                          ('id', 'league', 'season', 'home', 'visitor', 'score'))
 
+            cursor.execute('SELECT * FROM matches')
             for i in (cursor.fetchall()):
-                matches.write('{0:^10} | {0:^40} | {0:^10} | {1:^30} | {2:^30} | {3:^10}\n'.format
-                        (i[0],i[1],i[2],i[3],i[4],i[5]))
+                matches.write(f'{i[0]:^10} | {i[1]:^20} | {i[2]:^10} | ' +
+                              f'{i[3]:^30} | {i[4]:^30} | {i[5]:^10}\n')
 
             cursor.execute('SELECT * FROM odds')
             odds = open('odds.txt', 'w')
             odds.write('{0:^20} | {1:^20} | {2:^20} | {3:^20} | {4:^20}\n'.format
-                        ('bookmaker', 'odd_home', 'odd_draw', 'odd_visitor', 'fk_id_match'))
+                       ('bookmaker', 'odd_home', 'odd_draw', 'odd_visitor', 'fk_id_match'))
 
             for i in (cursor.fetchall()):
-                odds.write('{0:^20} | {1:^20} | {2:^20} | {3:^20} | {4:^20}\n'.format
-                        (i[1],i[2],i[3],i[4],i[5]))
+                odds.write(
+                    f'{i[1]:^20} | {i[2]:^20} | {i[3]:^20} | {i[4]:^20} | {i[5]:^20}\n')
 
             matches.close()
             odds.close()

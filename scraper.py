@@ -1,16 +1,14 @@
 from datetime import datetime
-from timeit import default_timer as timer
 import os
 import time
 
 from bs4 import BeautifulSoup
 from selenium.webdriver.firefox.options import Options
 from selenium import webdriver
-from selenium.common.exceptions import WebDriverException
 import requests
 
-import db
 from my_exceptions import InsertIntoDBError
+import db
 
 
 class Scraper():
@@ -27,50 +25,51 @@ class Scraper():
         scraper_log = open('scraper_log.txt', 'a')
         if code == 1:
             scraper_log.write('%s\n' % (str(self.error_count)+' - '+now +
-                                        ': The page does not exist or is not responding\n' +
-                                        'match odds on url: '+url +
-                                        ', were not entered in database\n'))
-        elif code == 2:
-            scraper_log.write('%s\n' % (str(self.error_count)+' - '+now +
-                                        ': The match does not have odds avaliable' +
-                                        ' or they arent in expected format or the page doesnt load on' +
-                                        ' the expected time.' +
+                                        ': The page doesnt load on' +
+                                        " the expected time, or the game doesn't have odds." +
+                                        "Verify your internet connection." +
                                         '\nmatch odds on url: '+url +
                                         ', were not entered in database\n'))
-        elif code == 3:
+        elif code == 2:
             scraper_log.write('%s\n' % (str(self.error_count)+' - '+now +
                                         ': Page results-soccer can not be reacheble' +
                                         ' or the url is wrong' +
                                         '\nmatchs on url: '+url +
                                         ', were not entered in database\n'))
-        elif code == 4:
+        elif code == 3:
             scraper_log.write('%s\n' % (str(self.error_count)+' - '+now +
                                         ': Error for insert data on db' +
                                         '\nmatchs on url: '+url +
                                         ', were not entered in database\n'))
         scraper_log.close()
 
-    def __get_page_odds(self, url: str) -> None:
+    def __get_page_odds(self, url: str, attempts: int):
         # loads the js in details page of each match and return the html of match odds
+        if attempts == 0:
+            raise AttributeError
+
         firefox_options = Options()
         firefox_options.headless = True
         driver = webdriver.Firefox(
-            executable_path=r'C:\Programas\geckodriver.exe', options=firefox_options)
+            executable_path='C:\Programas\geckodriver.exe', options=firefox_options,
+            timeout=5
+        )
         try:
             driver.get(url)
-        except WebDriverException:
-            self.__log_exceptions(1, url)
-            raise WebDriverException
-        else:
-            time.sleep(5)
             html = driver.page_source
             bs = BeautifulSoup(html, 'html.parser')
             trs = (bs.find('table', id='sortable-1')).tbody.find_all('tr')
-            return trs
-        finally:
+        except:
+            attempts -= 1
             driver.close()
+            print('Your network might be down. retrying in 5s...\n')
+            time.sleep(5)
+            return self.__get_page_odds(url, attempts)
+        else:
+            driver.close()
+            return trs
 
-    def __get_page_results(self, url: str) -> None:
+    def __get_page_results(self, url: str):
         try:
             html = requests.get(url)
             bs = BeautifulSoup(html.content, 'html.parser')
@@ -81,35 +80,30 @@ class Scraper():
             season = (spans[0].get_text()).split(' ')[-1]
             trs = table.find_all('tr')
         except:
-            self.__log_exceptions(3, url)
+            self.__log_exceptions(2, url)
             raise ValueError
         else:
             return trs, championship, season
 
-    def __scraping_page_odds(self, url: str) -> None:
+    def __scraping_page_odds(self, trs) -> dict:
         dic = {}
-        try:
-            trs = self.__get_page_odds(url)
-        except:
-            raise WebDriverException
-        else:
-            for i in range(len(trs)):
-                tds = trs[i].find_all('td')
-                for j in range(len(tds)):
-                    att = tds[j].attrs
-                    if ('data-odd' in att.keys()):
-                        dic[tds[0].a.get_text()] = [tds[j]['data-odd'], tds[j+1]
-                                                    ['data-odd'], tds[j+2]['data-odd']]
-                        break
-            return dic
+        for i in range(len(trs)):
+            tds = trs[i].find_all('td')
+            try:
+                dic[tds[0].a.get_text()] = [tds[3]['data-odd'], tds[4]
+                                            ['data-odd'], tds[5]['data-odd']]
+            except:
+                pass
+        return dic
 
     def do_scraping(self, url: str, num_seasons: int) -> None:
         if num_seasons == 0:
             return None
         try:
             trs, championship, season = self.__get_page_results(url)
-        except:
-            print('Erro. Talvez o link esteja incorreto')
+        except ValueError:
+            print(url)
+            print('Error. The url might be incorrect')
         else:
             for i in range(len(trs)):
                 if len(trs[i].find_all('td')) > 0:
@@ -118,28 +112,21 @@ class Scraper():
                     spans = td1.a.find_all('span')
                     teams = [spans[x].get_text() for x in range(2)]
                     score = td2.a.get_text()
+                    link = 'https://www.betexplorer.com'+td1.a['href']
                     try:
-                        odds = self.__scraping_page_odds(
-                            'https://www.betexplorer.com'+td1.a['href'])
+                        odds_trs = self.__get_page_odds(link, 10)
+                        odds = self.__scraping_page_odds(odds_trs)
                         db.add_match_db(
                             [championship, season, teams[0], teams[1], score], odds
                         )
                     except InsertIntoDBError:
-                        self.__log_exceptions(
-                            4, 'https://www.betexplorer.com'+td1.a['href'])
-                    except:
-                        self.__log_exceptions(
-                            2, 'https://www.betexplorer.com'+td1.a['href'])
+                        self.__log_exceptions(3, link)
+                    except AttributeError:
+                        self.__log_exceptions(1, link)
             num_seasons -= 1
             year1 = int(season.split('/')[0])
+            argmt = url.split('/')
+            league = championship.replace(' ', '-').lower()
             return self.do_scraping('https://www.betexplorer.com/soccer/' +
-                                    f'england/premier-league-{str(year1-1)}-{str(year1)}'+
+                                    f'{argmt[4]}/{league}-{str(year1-1)}-{str(year1)}' +
                                     '/results/', num_seasons)
-
-
-scraper = Scraper()
-start = timer()
-scraper.do_scraping(
-    'https://www.betexplorer.com/soccer/england/premier-league-2020-2021/results/', 1)
-end = timer()
-print(f'Tempo gasto: {(end - start)/3600:.3f}h')
