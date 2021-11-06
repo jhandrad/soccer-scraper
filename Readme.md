@@ -22,7 +22,7 @@ Caso o primeiro modo de execução tenha sido escolhido, digitar um número entr
 * 4 - LaLiga
 * 5 - Ligue 1
 
-Por último, digite o números de temporadas anteriores à temporada 2020-2021 que deseja coletar.
+Por último, digite o número de temporadas anteriores à temporada 2020-2021 que deseja coletar.
 
 _*caso escolha o segundo modo execução, um arquivo matches.txt e um odds.txt serão criados no diretório em que programa estiver localizado._
 
