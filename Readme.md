@@ -1,6 +1,6 @@
 # soccer-scraper
 
-Scraper escrito em python para coletar dados de jogos de fultebol do site betexplorer.
+Scraper escrito em python para coletar e armazenar em um bd dados de jogos de fultebol do site betexplorer.
 
 ### Modos de execução
 
@@ -22,7 +22,7 @@ Caso o primeiro modo de execução tenha sido escolhido, digitar um número entr
 * 4 - LaLiga
 * 5 - Ligue 1
 
-Por último, digite o números de temporadas anteriores à temporada 2020-2021 que deseja coletar.
+Por último, digite o número de temporadas anteriores à temporada 2020-2021 que deseja coletar.
 
 _*caso escolha o segundo modo execução, um arquivo matches.txt e um odds.txt serão criados no diretório em que o programa estiver localizado._
 
@@ -43,4 +43,10 @@ _*As versões específicas de cada lib estão no arquivo requirements.txt._
 
 ### Observações
 
+<<<<<<< HEAD
 * Em caso de problemas verificar o arquivo scraper_log.txt que é gerado ao final de uma execução com falha.
+=======
+* Mudar o caminho do interpretador python no arquivo main.py de acordo com a localização do mesmo na sua máquina.
+* Em caso de problemas verificar o arquivo scraper_log.txt que é gerado ao final de uma execução com falha.
+* O programa leva cerca de 1,5 hora para coletar os dados de uma temporada inteira.
+>>>>>>> dcbcee1b6328bd15407d96f9807a44905567916e
