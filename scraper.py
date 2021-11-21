@@ -26,9 +26,9 @@ class Scraper():
         if code == 1:
             scraper_log.write('%s\n' % (str(self.error_count)+' - '+now +
                                         ': The page doesnt load on' +
-                                        " the expected time, or the game doesn't have odds." +
+                                        " the expected time, or the game doesn't have odds_1x2." +
                                         "Verify your internet connection." +
-                                        '\nmatch odds on url: '+url +
+                                        '\nmatch odds_1x2 on url: '+url +
                                         ', were not entered in database\n'))
         elif code == 2:
             scraper_log.write('%s\n' % (str(self.error_count)+' - '+now +
@@ -43,8 +43,8 @@ class Scraper():
                                         ', were not entered in database\n'))
         scraper_log.close()
 
-    def __get_page_odds(self, url: str, attempts: int):
-        # loads the js in details page of each match and return the html of match odds
+    def __get_page_details(self, url: str, attempts: int, mode: int):
+        # loads the js in details page of each match and return the html of match odds_1x2
         if attempts == 0:
             raise AttributeError
 
@@ -59,15 +59,21 @@ class Scraper():
             html = driver.page_source
             bs = BeautifulSoup(html, 'html.parser')
             trs = (bs.find('table', id='sortable-1')).tbody.find_all('tr')
+            divs = (bs.find_all('div', id='odds-content')
+                    )[0].find_all('div', class_='box-overflow')
+            date_instant = self.__format_date_instant(bs.find('p', id='match-date').get_text())
         except:
             attempts -= 1
             driver.close()
-            print('Your network might be down. retrying in 5s...\n')
+            print('\nYour network might be down. retrying in 5s...')
             time.sleep(5)
-            return self.__get_page_odds(url, attempts)
+            return self.__get_page_details(url, attempts, mode)
         else:
             driver.close()
-            return trs
+            if mode == 1:
+                return trs, date_instant
+            elif mode == 2:
+                return divs
 
     def __get_page_results(self, url: str):
         try:
@@ -85,44 +91,84 @@ class Scraper():
         else:
             return trs, championship, season
 
-    def __scraping_page_odds(self, trs) -> dict:
+    def __get_odds_1x2(self, trs) -> dict:
         dic = {}
         for i in range(len(trs)):
             tds = trs[i].find_all('td')
             try:
-                dic[tds[0].a.get_text()] = [tds[3]['data-odd'], tds[4]
-                                            ['data-odd'], tds[5]['data-odd']]
+                dic[tds[0].a.get_text()] = [float(tds[3]['data-odd']), float(tds[4]
+                                            ['data-odd']), float(tds[5]['data-odd'])]
             except:
                 pass
         return dic
 
-    def do_scraping(self, url: str, num_seasons: int) -> None:
+    def __get_odds_ou(self, divs) -> dict:
+        dic = {}
+        for i in range(len(divs)):
+            trs = (divs[i].table.tbody.find_all('tr'))
+            for j in range(len(trs)):
+                tds = trs[j].find_all('td')
+                try: 
+                    if tds[0].a.get_text() in dic.keys():
+                        dic[tds[0].a.get_text()].append([float(tds[3].get_text()), 
+                                                        float(tds[4]['data-odd']),
+                                                        float(tds[5]['data-odd'])])
+                    else:
+                        dic[tds[0].a.get_text()] = [[float(tds[3].get_text()),
+                                                    float(tds[4]['data-odd']),
+                                                    float(tds[5]['data-odd'])]]
+                except:
+                    pass
+        return dic
+   
+    def __format_round(self, round: str) -> str:
+        return int(round.split('.')[0])
+
+    def __format_score(self, score: str) -> tuple:
+        s = score.split(':')
+        return (int(s[0]), int(s[1]))
+
+    def __format_date_instant(self, dt_instant: str) -> tuple:
+        dt = dt_instant.split('-')
+        return (dt[0].strip(), dt[1].strip())
+
+    def do_scraping(self, league: list, num_seasons: int) -> None:
+        url = f'https://www.betexplorer.com/soccer/{league[0]}/{league[1]}-2020-2021/results/'
         if num_seasons == 0:
             return None
         try:
             trs, championship, season = self.__get_page_results(url)
+            round = 0
         except ValueError:
             print(url)
             print('Error. The url might be incorrect')
         else:
-            for i in range(len(trs)):
+            for i in range(2):
                 if len(trs[i].find_all('td')) > 0:
                     td1 = trs[i].find('td', class_='h-text-left')
                     td2 = trs[i].find('td', class_='h-text-center')
                     spans = td1.a.find_all('span')
                     teams = [spans[x].get_text() for x in range(2)]
-                    score = td2.a.get_text()
+                    score = self.__format_score(td2.a.get_text())
                     link = 'https://www.betexplorer.com'+td1.a['href']
                     try:
-                        odds_trs = self.__get_page_odds(link, 10)
-                        odds = self.__scraping_page_odds(odds_trs)
+                        odds_1x2_trs, date_instant  = self.__get_page_details(link,10,1)
+                        odds_ou_divs= self.__get_page_details(f'{link}#ou',10,2)
+                        odds_1x2 = self.__get_odds_1x2(odds_1x2_trs)
+                        odds_ou = self.__get_odds_ou(odds_ou_divs)
                         db.add_match_db(
-                            [championship, season, teams[0], teams[1], score], odds
+                            [teams[0], teams[1], championship, date_instant[0],
+                            date_instant[1], score[0], score[1], round, season],
+                            odds_1x2, odds_ou
                         )
                     except InsertIntoDBError:
                         self.__log_exceptions(3, link)
                     except AttributeError:
                         self.__log_exceptions(1, link)
+                else:
+                    ths = trs[i].find_all('th')
+                    round = self.__format_round(ths[0].get_text())
+
             num_seasons -= 1
             year1 = int(season.split('/')[0])
             argmt = url.split('/')

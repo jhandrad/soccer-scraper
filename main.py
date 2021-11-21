@@ -1,4 +1,3 @@
-#!c:/Users/joaoh/Documents/Projetos/soccer_scraper/scraping_env/Scripts/python.exe
 from datetime import datetime
 import argparse
 
@@ -29,14 +28,12 @@ def add_new_data():
         3 - Bundesliga
         4 - LaLiga
         5 - Ligue 1''')
-    option = input('Type the number of the league: ')
+    option = input('\nChoose the league: ')
     league = options.get(option, 'null')
-    if league != 'null':
-        url = f'https://www.betexplorer.com/soccer/{league[0]}/{league[1]}-2020-2021/results/'
     number_of_seasons = int(input('Type the number of previous seasons: '))
     s = Scraper()
     start = datetime.now()
-    s.do_scraping(url, number_of_seasons)
+    s.do_scraping(league, number_of_seasons)
     time_elapsed = datetime.now() - start
     print(f'Time elapsed: {time_elapsed}')
 
