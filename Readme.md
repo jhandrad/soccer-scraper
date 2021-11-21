@@ -43,10 +43,5 @@ _*As versões específicas de cada lib estão no arquivo requirements.txt._
 
 ### Observações
 
-<<<<<<< HEAD
 * Em caso de problemas verificar o arquivo scraper_log.txt que é gerado ao final de uma execução com falha.
-=======
-* Mudar o caminho do interpretador python no arquivo main.py de acordo com a localização do mesmo na sua máquina.
-* Em caso de problemas verificar o arquivo scraper_log.txt que é gerado ao final de uma execução com falha.
-* O programa leva cerca de 1,5 hora para coletar os dados de uma temporada inteira.
->>>>>>> dcbcee1b6328bd15407d96f9807a44905567916e
+
