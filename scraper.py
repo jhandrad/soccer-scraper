@@ -158,7 +158,7 @@ class Scraper():
             print(url)
             print('Error. The url might be incorrect')
         else:
-            for i in range(2):
+            for i in range(len(trs)):
                 if len(trs[i].find_all('td')) > 0:
                     td1 = trs[i].find('td', class_='h-text-left')
                     td2 = trs[i].find('td', class_='h-text-center')
