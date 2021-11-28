@@ -2,35 +2,28 @@
 
 Scraper escrito em python para coletar e armazenar em um bd dados de jogos de fultebol do site betexplorer.
 
-### Modos de execução
-
-O scraper possui dois modos de execução:
-* 1 - Adicionar ao banco de dados novos dados
-* 2 - Gerar um txt com os dados atuais no banco de dados
-
 ### Modo de usar
 
-A partir do terminal de comando digitar o nome do aquivo principal e informar o modo de execução:
+A partir do terminal inserir o comando a baixo:
 
-python main.py [1,2]
+python main.py
 
-Caso o primeiro modo de execução tenha sido escolhido, digitar um número entre 1 - 5 que corresponda a um dos campeotanos listados:
+Serão exibidas as opções de campeonatos disponíveis, você deve escolher uma das opções de 1-6:
 
 * 1 - Premier League
 * 2 - Serie A (Italy)
 * 3 - Bundesliga
 * 4 - LaLiga
 * 5 - Ligue 1
+* 6 - Série A (Brazil)
 
-Por último, digite o número de temporadas anteriores à temporada 2020-2021 que deseja coletar.
-
-_*caso escolha o segundo modo execução, um arquivo matches.txt e um odds.txt serão criados no diretório em que o programa estiver localizado._
+Por último, digite o número de temporadas anteriores à temporada 2020-2021 que deseja coletar (com o número máximo suportado sendo 11).
 
 ### Arquivos
 
 * db.py: contém as funções que criam/consultam/modificam o banco de dados.
 * my_exceptions.py: possui uma exceção específica para informar falha ao adicionar um registro no banco de dados.
-* scraper.py: contém a classe Scraper.
+* scraper.py: contém a classe Scraper com as funções responsáveis por coletar os dados.
 * main.py: contém a função principal utilizada para executar o programa.
 
 ### Requisitos
@@ -45,3 +38,8 @@ _*As versões específicas de cada lib estão no arquivo requirements.txt._
 
 * Em caso de problemas verificar o arquivo scraper_log.txt que é gerado ao final de uma execução com falha.
 
+### Arquitetura do BD
+
+<p align="center">
+<img width="660" height="530" src="imagens/db_logic.png">
+</p>

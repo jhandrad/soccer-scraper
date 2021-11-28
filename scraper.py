@@ -43,8 +43,7 @@ class Scraper():
                                         ', were not entered in database\n'))
         scraper_log.close()
 
-    def __get_page_details(self, url: str, attempts: int, mode: int):
-        # loads the js in details page of each match and return the html of match odds_1x2
+    def __get_page_details(self, url: str, attempts: int, mode: int, delay: float):
         if attempts == 0:
             raise AttributeError
 
@@ -52,7 +51,7 @@ class Scraper():
         firefox_options.headless = True
         driver = webdriver.Firefox(
             executable_path='C:\Programas\geckodriver.exe', options=firefox_options,
-            timeout=5
+            timeout=1
         )
         try:
             driver.get(url)
@@ -65,9 +64,10 @@ class Scraper():
         except:
             attempts -= 1
             driver.close()
-            print('\nYour network might be down. retrying in 5s...')
-            time.sleep(5)
-            return self.__get_page_details(url, attempts, mode)
+            print(f'\nYour network might be down. retrying in {delay:.2f}s...')
+            time.sleep(delay)
+            delay *= 2
+            return self.__get_page_details(url, attempts, mode, delay)
         else:
             driver.close()
             if mode == 1:
@@ -132,9 +132,24 @@ class Scraper():
         dt = dt_instant.split('-')
         return (dt[0].strip(), dt[1].strip())
 
-    def do_scraping(self, league: list, num_seasons: int) -> None:
-        url = f'https://www.betexplorer.com/soccer/{league[0]}/{league[1]}-2020-2021/results/'
-        if num_seasons == 0:
+    def __aux_url(self, season: str) -> str:
+        years = season.split('-')
+        if len(years) == 2:
+            year_2 = int(years[0])
+            year_1 = year_2-1
+            return f'{year_1}-{year_2}'
+        elif len(years) == 1:
+            return f'{int(years[0])-1}'
+
+    def __format_league(self, attrs: tuple):
+        if attrs[0] == 'Serie A':
+            return f'{attrs[0]} ({attrs[1].title()})'
+        else:
+            return attrs[0]
+
+    def do_scraping(self, op: list, num_seasons: int) -> None:
+        url = f'https://www.betexplorer.com/soccer/{op[0]}/{op[1]}-{op[2]}/results/'
+        if num_seasons <= 0:
             return None
         try:
             trs, championship, season = self.__get_page_results(url)
@@ -151,9 +166,10 @@ class Scraper():
                     teams = [spans[x].get_text() for x in range(2)]
                     score = self.__format_score(td2.a.get_text())
                     link = 'https://www.betexplorer.com'+td1.a['href']
+                    championship = self.__format_league((championship,op[0]))
                     try:
-                        odds_1x2_trs, date_instant  = self.__get_page_details(link,10,1)
-                        odds_ou_divs= self.__get_page_details(f'{link}#ou',10,2)
+                        odds_1x2_trs, date_instant  = self.__get_page_details(link,10,1,0.05)
+                        odds_ou_divs= self.__get_page_details(f'{link}#ou',10,2,0.05)
                         odds_1x2 = self.__get_odds_1x2(odds_1x2_trs)
                         odds_ou = self.__get_odds_ou(odds_ou_divs)
                         db.add_match_db(
@@ -170,9 +186,5 @@ class Scraper():
                     round = self.__format_round(ths[0].get_text())
 
             num_seasons -= 1
-            year1 = int(season.split('/')[0])
-            argmt = url.split('/')
-            league = championship.replace(' ', '-').lower()
-            return self.do_scraping('https://www.betexplorer.com/soccer/' +
-                                    f'{argmt[4]}/{league}-{str(year1-1)}-{str(year1)}' +
-                                    '/results/', num_seasons)
+            op[2] = self.__aux_url(op[2])
+            return self.do_scraping(op,num_seasons)

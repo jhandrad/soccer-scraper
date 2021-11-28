@@ -1,57 +1,51 @@
 from datetime import datetime
-import argparse
 
 from scraper import Scraper
-import db
-
-parser = argparse.ArgumentParser(
-    description='Get match data by league and season')
-parser.add_argument('mode', type=int,
-                    help='''App modes:
-                            1 - Add new data
-                            2 - Generates a txt of the current data in db''')
-args = parser.parse_args()
 
 
-def add_new_data():
+def add_new_data() -> None:
     options = {
-        '1': ['england', 'premier-league'],
-        '2': ['italy', 'serie-a'],
-        '3': ['germany', 'bundesliga'],
-        '4': ['spain', 'laliga'],
-        '5': ['france', 'ligue-1'],
+        1: ['england', 'premier-league', '2020-2021'],
+        2: ['italy', 'serie-a', '2020-2021'],
+        3: ['germany', 'bundesliga', '2020-2021'],
+        4: ['spain', 'laliga', '2020-2021'],
+        5: ['france', 'ligue-1', '2020-2021'],
+        6: ['brazil', 'serie-a', '2020']
     }
     print('''
-            Options
+             Options
+        ==================
         1 - Premier League
         2 - Serie A (Italy)
         3 - Bundesliga
         4 - LaLiga
-        5 - Ligue 1''')
-    option = input('\nChoose the league: ')
-    league = options.get(option, 'null')
-    number_of_seasons = int(input('Type the number of previous seasons: '))
+        5 - Ligue 1
+        6 - Série A (Brazil)''')
+    while True:
+        try:
+            option = int(input('\nChoose the league: '))
+            number_of_seasons = int(input('Number of previous seasons: '))
+        except:
+            print('Only integers are valid.')
+            continue
+        league = options.get(option)
+        if league == None or number_of_seasons > 11:
+            print('Invalid. The league you chose is invalid'+
+                  ' or the number of seasons is greater than 11.')
+        else:
+            break    
     s = Scraper()
+    print(calc_time_spent(s,[league,number_of_seasons]))
+
+
+def calc_time_spent(s: Scraper, vars: list) -> str:
     start = datetime.now()
-    s.do_scraping(league, number_of_seasons)
-    time_elapsed = datetime.now() - start
-    print(f'Time elapsed: {time_elapsed}')
-
-
-def generate_txt():
-    db.get_db()
-
-
-def invalid_mode():
-    print('Modes:' +
-          '\n1 - Add new data' +
-          '\n2 - Generates a txt of the current data in db')
+    s.do_scraping(vars[0],vars[1])
+    time_elapsed = str(datetime.now() - start).split(':')
+    time_elapsed[-1] = round(float(time_elapsed[-1]))
+    t_e = f'{time_elapsed[0]}:{time_elapsed[1]}:{time_elapsed[2]}'
+    return f'Time elapsed: {t_e}'
 
 
 if __name__ == '__main__':
-    switch = {
-        1: add_new_data,
-        2: generate_txt
-    }
-    case = switch.get(args.mode, invalid_mode)
-    case()
+    add_new_data()
