@@ -41,5 +41,5 @@ _*As versões específicas de cada lib estão no arquivo requirements.txt._
 ### Arquitetura do BD
 
 <p align="center">
-<img width="660" height="530" src="imagens/db_logic.png">
+<img width="847" height="795" src="imagens/db_logic.png">
 </p>
