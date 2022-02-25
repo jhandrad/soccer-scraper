@@ -4,11 +4,7 @@ Scraper escrito em python para coletar e armazenar em um bd dados de jogos de fu
 
 ### Modo de usar
 
-A partir do terminal inserir o comando a baixo:
-
-python main.py
-
-Serão exibidas as opções de campeonatos disponíveis, você deve escolher uma das opções de 1-6:
+Após executar o arquivo main.py serão exibidas as opções de campeonatos disponíveis, você deve escolher uma das opções de 1-6:
 
 * 1 - Premier League
 * 2 - Serie A (Italy)
@@ -17,7 +13,7 @@ Serão exibidas as opções de campeonatos disponíveis, você deve escolher uma
 * 5 - Ligue 1
 * 6 - Série A (Brazil)
 
-Por último, digite o número de temporadas anteriores à temporada 2020-2021 que deseja coletar (com o número máximo suportado sendo 11).
+Digite a temporada que deseja começar (ex: 2020-2021), por último, digite o número de temporadas anteriores que deseja coletar (de forma retroativa).
 
 ### Arquivos
 
@@ -31,10 +27,14 @@ Por último, digite o número de temporadas anteriores à temporada 2020-2021 qu
 * beautifulsoup4
 * requests
 * selenium
+* geckodriver
+* firefox
 
 _*As versões específicas de cada lib estão no arquivo requirements.txt._
 
 ### Observações
+
+* É necessário passar o caminho do geckodriver.exe no arquivo scraper.py.
 
 * Em caso de problemas verificar o arquivo scraper_log.txt que é gerado ao final de uma execução com falha.
 
