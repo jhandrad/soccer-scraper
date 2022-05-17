@@ -1,5 +1,7 @@
-import requests
 import os
+from pathlib import Path
+
+import requests
 
 
 # relacao de-para entre codigo e a divisao do campeonato
@@ -16,7 +18,8 @@ def get_sumula(ano, serie, num_jogo):
     if create_dir:
         os.mkdir(f'Súmulas/{ano}')
     # cria a pasta da divisao dentro da pasta do ano caso ainda nao exista
-    create_dir = not os.path.isdir(f'Súmulas/{ano}/{de_para_cod_serie.get(serie)}')
+    create_dir = not os.path.isdir(
+        f'Súmulas/{ano}/{de_para_cod_serie.get(serie)}')
     if create_dir:
         os.mkdir(f'Súmulas/{ano}/{de_para_cod_serie.get(serie)}')
     # necessario por conta da diferenca da url antes e depois de 2012
@@ -26,7 +29,17 @@ def get_sumula(ano, serie, num_jogo):
         sumula_pdf = requests.get(url_igual_2012)
         path = f'Súmulas/{ano}/{de_para_cod_serie.get(serie)}'
         with open(f'{path}/sumula_{ano}{serie}{num_jogo}.pdf', 'wb') as f:
-            f.write(sumula_pdf.content)
+            cont = 0
+            sz = 0
+            while(sz <= 10 and cont < 5):
+                f.write(sumula_pdf.content)
+                sz = Path(
+                    f'{path}/sumula_{ano}{serie}{num_jogo}.pdf').stat().st_size
+                cont += 1
+                if cont == 5:
+                    print('Última tentativa.')
+                    print('Verifique a disponibilidade da rede ou do arquivo:' +
+                          f'ano:{ano} serie:{serie} n.jogo:{num_jogo}')
 
     else:
         # faz o get no pdf e salva no diretório
@@ -34,13 +47,20 @@ def get_sumula(ano, serie, num_jogo):
         sumula_pdf = requests.get(url_maior_2012)
         path = f'Súmulas/{ano}/{de_para_cod_serie.get(serie)}'
         with open(f'{path}/sumula_{ano}{serie}{num_jogo}.pdf', 'wb') as f:
-            f.write(sumula_pdf.content)
+            cont = 0
+            sz = 0
+            while(sz <= 10 and cont < 5):
+                f.write(sumula_pdf.content)
+                sz = Path(
+                    f'{path}/sumula_{ano}{serie}{num_jogo}.pdf').stat().st_size
+                cont += 1
+                if cont == 5:
+                    print('Última tentativa.')
+                    print('Verifique a disponibilidade da rede ou do arquivo:' +
+                          f'ano:{ano} serie:{serie} n.jogo:{num_jogo}')
 
 
-for i in range(2017,2022):
-    for j in [1,2,3,5]:
-        for k in range(1,381):
-            get_sumula(i,j,k)
-
-
-
+for i in range(2012, 2022):
+    for j in [1, 2, 3, 5]:
+        for k in range(1, 381):
+            get_sumula(i, j, k)

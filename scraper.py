@@ -8,7 +8,7 @@ from selenium import webdriver
 import requests
 
 from my_exceptions import InsertIntoDBError
-import db
+import db_matches
 
 
 class Scraper():
@@ -16,7 +16,7 @@ class Scraper():
     def __init__(self) -> None:
         create_db = not os.path.isfile('matches.db')
         if create_db:
-            db.create_db()
+            db_matches.create_db()
         self.error_count = 0
 
     def __log_exceptions(self, code: int, url: str) -> None:
@@ -50,9 +50,7 @@ class Scraper():
         firefox_options = Options()
         firefox_options.headless = True
         driver = webdriver.Firefox(
-            executable_path='C:\Programas\geckodriver.exe', options=firefox_options,
-            timeout=1
-        )
+            executable_path='C:\Programas\geckodriver.exe', options=firefox_options)
         try:
             driver.get(url)
             html = driver.page_source
@@ -169,7 +167,7 @@ class Scraper():
         url = input('url: ')
         odds_1x2, date_instant = self.__get_odds_1x2(url)
         odds_ou = self.__get_odds_ou(url)
-        db.add_match_db(
+        db_matches.add_match_db(
             [team1, team2, league, date_instant[0],
             date_instant[1], score1, score2, round, season],
             odds_1x2, odds_ou
@@ -198,7 +196,7 @@ class Scraper():
                     try:
                         odds_1x2, date_instant = self.__get_odds_1x2(link)
                         odds_ou = self.__get_odds_ou(link)
-                        db.add_match_db(
+                        db_matches.add_match_db(
                             [teams[0], teams[1], championship, date_instant[0],
                             date_instant[1], score[0], score[1], round, season],
                             odds_1x2, odds_ou
