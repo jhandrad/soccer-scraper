@@ -1,0 +1,5 @@
+Jogos com problema no nome dos times (impossibilidade para distinguir nomes): 4
+	_id = 62b49c038f6cacbb0aa54fd0
+	_id = 62b49c3d8f6cacbb0aa5578b
+	_id = 62b49c968f6cacbb0aa55d62
+	_id = 62b49c9b8f6cacbb0aa55e24

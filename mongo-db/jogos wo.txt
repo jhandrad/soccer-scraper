@@ -1,0 +1,9 @@
+Jogos que foram W.O.: 8
+	_id = 62b49c288f6cacbb0aa5555c
+	_id = 62b49c9c8f6cacbb0aa55e4d
+	_id = 62b49ce48f6cacbb0aa5665c
+	_id = 62b4a33236bebe908ce029c7
+	_id = 62b4a36b36bebe908ce02e31
+	_id = 62b4a36d36bebe908ce02e62
+	_id = 62b4a36e36bebe908ce02e85
+	_id = 62b4a62003039cdb185b298d
