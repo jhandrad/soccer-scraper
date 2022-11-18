@@ -1,3 +1,10 @@
+# Organização dos arquivos
+
+* Bds: Os bancos de dados gerados
+* mongo-db: Scripts para detectar registros com problemas no arquivo de bd mongo
+* rest-api: Api para consulta dos dados obtidos das sumulas
+* Scripts: Os códigos escritos para as atividades da primeira parte do projeto
+
 # soccer-scraper
 
 Scraper escrito em python para coletar e armazenar em um bd dados de jogos de fultebol do site betexplorer.
