@@ -179,17 +179,17 @@ except:
 
 cnx = sqlite3.connect('sumulas.db')
 
-pd.DataFrame(data=matches_).to_csv('Matches.csv')
-pd.DataFrame(data=championships_).to_csv('Championship.csv')
-pd.DataFrame(data=teams_).to_csv('Teams.csv')
-pd.DataFrame(data=athletes_).to_csv('Athletes.csv')
-pd.DataFrame(data=athletes_matches_).to_csv('Athletes_matches.csv')
+# pd.DataFrame(data=matches_).to_csv('Matches.csv')
+# pd.DataFrame(data=championships_).to_csv('Championship.csv')
+# pd.DataFrame(data=teams_).to_csv('Teams.csv')
+# pd.DataFrame(data=athletes_).to_csv('Athletes.csv')
+# pd.DataFrame(data=athletes_matches_).to_csv('Athletes_matches.csv')
 
-# pd.DataFrame(data=matches_).to_sql(name='Matches', con=cnx, index=False)
-# pd.DataFrame(data=championships_).to_sql(name='Championship', con=cnx,index=False)
-# pd.DataFrame(data=teams_).to_sql(name='Teams', con=cnx,index=False)
-# pd.DataFrame(data=athletes_).to_sql(name='Athletes', con=cnx,index=False)
-# pd.DataFrame(data=athletes_matches_).to_sql(name='Athletes_matches', con=cnx,index=False)
+pd.DataFrame(data=matches_).to_sql(name='Matches', con=cnx, index=False)
+pd.DataFrame(data=championships_).to_sql(name='Championship', con=cnx,index=False)
+pd.DataFrame(data=teams_).to_sql(name='Teams', con=cnx,index=False)
+pd.DataFrame(data=athletes_).to_sql(name='Athletes', con=cnx,index=False)
+pd.DataFrame(data=athletes_matches_).to_sql(name='Athletes_matches', con=cnx,index=False)
 
 
 # pdf = p2.PdfFileReader('Súmulas/2013/Série A/sumula_2013192.pdf')
